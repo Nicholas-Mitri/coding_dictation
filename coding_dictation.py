@@ -16,6 +16,22 @@ def play_audio(file_path):
     pygame.mixer.music.play()
 
 
+def select_copy_all():
+    keyboard_controller = keyboard.Controller()
+    keyboard_controller.press(keyboard.Key.cmd)
+    keyboard_controller.press("a")
+    keyboard_controller.release("a")
+    keyboard_controller.release(keyboard.Key.cmd)
+
+    # copy to clipboard
+    keyboard_controller.press(keyboard.Key.cmd)
+    keyboard_controller.press("c")
+    keyboard_controller.release("c")
+    keyboard_controller.release(keyboard.Key.cmd)
+
+    return pyperclip.paste()
+
+
 # Code execution continues while the audio is playing
 def record_audio():
     global is_recording
@@ -84,9 +100,10 @@ def on_activate_stop():
     except FileNotFoundError:
         print("System prompt file not found. Please make sure the file exists.")
 
-    response_text = gpt_fn.send_system_and_user_prompts(
-        system_prompt, recording_transcipt
-    )
+    user_prompt = recording_transcipt + "\n\n" + "Context: " + select_copy_all()
+    # print("User_prompt:", user_prompt, end="\n\n")
+
+    response_text = gpt_fn.send_system_and_user_prompts(system_prompt, user_prompt)
     time_stop = time.perf_counter()
 
     # save the response to clipboard
@@ -114,18 +131,24 @@ def on_activate_exit():
     sys.exit()
 
 
+def manage_recording():
+    global is_recording
+    if is_recording:
+        on_activate_stop()
+    else:
+        on_activate_start()
+
+
 def run_listen_up():
     print("Listening for keyboard shortcuts...")
     # Define the keyboard shortcuts
-    start_recording = "<f3>"
-    stop_recording = "<f4>"
+    toggle_recording = "<f4>"
     exit_app = "<cmd>+<shift>+<ctrl>+<alt>+q"
 
     # Create the keyboard listener
     with keyboard.GlobalHotKeys(
         {
-            start_recording: on_activate_start,
-            stop_recording: on_activate_stop,
+            toggle_recording: manage_recording,
             exit_app: on_activate_exit,
         }
     ) as h:
