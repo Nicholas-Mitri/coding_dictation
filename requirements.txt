@@ -1,0 +1,7 @@
+ pynput
+ sounddevice
+ soundfile
+ numpy
+ gpt_fn
+ pyperclip
+ pygame
