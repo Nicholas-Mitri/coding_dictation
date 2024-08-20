@@ -23,7 +23,7 @@ def send_system_and_user_prompts(system_prompt, user_prompt):
         ],
     )
 
-    return completion.choices[0].message.content
+    return completion.choices[0].message.content  # type: ignore
 
 
 def transcribe_audio(audio_file_path):
