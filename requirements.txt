@@ -5,3 +5,4 @@
  gpt_fn
  pyperclip
  pygame
+openai
